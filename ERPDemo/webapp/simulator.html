@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>Electronic Road Pricing Simulator</title>
+
+	<!-- Bootstrap Core CSS -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- jQuery -->
+	<script src="js/jquery.min.js"></script>
+
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+	<!-- Leaflet -->
+	<link rel="stylesheet" href="css/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+	<style type="text/css">
+		#map {
+			width: 1200px;
+			height: 750px;
+			border: 1px solid black;
+		}
+
+		body {
+			background-color: black;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-default navbar-static-top" role="navigation"
+		style="margin-bottom: 100; background: black; border: 1px solid black">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<table>
+				<tr>
+					<td align="center">
+						<a class="navbar-brand" href="simulator.html">
+							<img src="images/confluent_logo_white.png" id="logo" width="150" />
+						</a>
+					</td>
+					<td valign="bottom">
+						<div style="font-size: 20px; color: #676c73">Electronic Road Pricing Simulator</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!-- /.navbar-header -->
+	</nav>
+
+	<div class="row">
+		<div class="col-lg-3">
+			<!-- /input-group -->
+			<div class="panel panel-default" style="border: 1px black">
+				<div id="results" class="panel-heading" style="background-color: #191919; font-size: 18px; color: #676c73">Vehicle On-Board Unit Simulator</div>
+				<!-- /.panel-heading -->
+				<div id="documents" class="panel-body" style="background-color: #191919; font-size: 14px; color: #676c73">
+					<table>
+						<tr>
+							<td>
+								Origin
+								<br><br>
+							</td>
+							<td>
+								&nbsp;
+								<input id="origin" type="text" style="border: 1px black; background-color: #676c73; font-size: 14px; color: #1e1f22">
+								<br><br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Destination
+								<br><br>
+							</td>
+							<td>
+								&nbsp;
+								<input id="destination" type="text" style="border: 1px black; background-color: #676c73; font-size: 14px; color: #1e1f22">
+								<br><br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								On-Board Unit <br> Transmission
+								<br><br>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+								<input type="radio" name="transmission" value="native" checked>&nbsp;&nbsp; Kafka Native <br>
+								&nbsp;&nbsp;
+								<input type="radio" name="transmission" value="mqtt">&nbsp;&nbsp; MQTT <br>
+								&nbsp;&nbsp;
+								<input type="radio" name="transmission" value="rest">&nbsp;&nbsp; REST
+								<br><br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								On-Board Unit <br> Message Format
+								<br><br>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+								<input type="radio" name="format" value="avro" checked>&nbsp;&nbsp; Avro <br>
+								&nbsp;&nbsp;
+								<input type="radio" name="format" value="json">&nbsp;&nbsp; JSON <br>
+								&nbsp;&nbsp;
+								<input type="radio" name="format" value="csv">&nbsp;&nbsp; CSV
+								<br><br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Confluent Cluster
+								<br><br>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+								<input type="radio" name="cluster" value="vm" checked>&nbsp;&nbsp; VM <br>
+								&nbsp;&nbsp;
+								<input type="radio" name="cluster" value="k8s">&nbsp;&nbsp; K8s  <br>
+								&nbsp;&nbsp;
+								<input type="radio" name="cluster" value="cc">&nbsp;&nbsp; Confluent Cloud
+								<br><br>
+							</td>
+						</tr>
+					</table>
+
+					<br>
+
+					<center>
+						<button id="start_trip" type="button" class="btn btn-dark" onclick="startTrip()">Start Trip</button>
+						<button id="reset_trip" type="button" class="btn btn-dark" onclick="resetTrip()" disabled>Reset</button>
+					</center>
+
+					<br>
+
+					<center>
+						<div id="results" class="panel-heading" style="background-color: #191919; font-size: 18px; color: #676c73">Tech Stack</div>
+
+						<img src="images/kafka_logo.png" id="logo" width="120" />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<img src="images/kotlin_logo.png" id="logo" width="120" />
+						<br>
+						<img src="images/ktor_logo.svg" id="logo" width="80" />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<img src="images/javalin_logo.svg" id="logo" width="80" />
+
+						<br><br>
+
+						<div id="results" class="panel-heading" style="background-color: #191919; font-size: 18px; color: #676c73">Platform</div>
+
+						<img src="images/confluent_logo_white.png" id="logo" width="120" />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<img src="images/google_cloud_logo.png" id="logo" width="120" />
+					</center>
+				</div>
+				<!-- /.panel-body -->
+			</div>
+			<!-- /.panel -->
+		</div>
+
+		<div class="col-lg-8" align="center">
+			<div id="map"></div>
+		</div>
+	</div>
+
+	<script>
+		var southWest = L.latLng(-180, -180);
+		var northEast = L.latLng(180, 180);
+
+		var bounds = L.latLngBounds(southWest, northEast);
+
+		var map = L.map('map', {
+			zoomControl : false,
+			maxBounds : bounds
+		}).setView([ 1.3521, 103.8198 ], 12);
+
+		var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+			{
+				attribution : '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+				subdomains : 'abcd',
+				minZoom : 3,
+				maxZoom : 18
+			}
+		);
+
+		map.addLayer(tiles);
+		
+		map.on('click', onMapClick);
+
+		var geoJsonLayer;
+		var heatmapLayer;
+		var marker;
+		var markers = [];
+		
+		var matching = 0;
+		var total = 0;
+		
+		var marker_lat = 1.3521;
+		var marker_lon = 103.8198;
+		
+		function onMapClick(e) {
+			
+			if (marker !== undefined) {
+				map.removeLayer(marker);
+			}
+			if (geoJsonLayer !== undefined) {
+				map.removeLayer(geoJsonLayer);
+				heatmapLayer.setLatLngs([]);
+			}
+
+			marker = L.marker(e.latlng);
+		    map.addLayer(marker);
+		    
+		    marker_lat = e.latlng.lat;
+		    marker_lon = e.latlng.lng;
+		}
+
+		function startTrip() {
+			var origin = $("#origin").val();
+			var destination = $("#destination").val();
+
+			$("#origin").attr("disabled", "true");
+			$("#destination").attr("disabled", "true");
+
+			var transmission = $("input[name=transmission]:checked").val();
+			var format = $("input[name=format]:checked").val();
+			var cluster = $("input[name=cluster]:checked").val();
+
+			$("input[name=transmission]").attr("disabled", "true");
+			$("input[name=format]").attr("disabled", "true");
+			$("input[name=cluster]").attr("disabled", "true");
+
+			$("#start_trip").attr("disabled", "true");
+			$("#reset_trip").removeAttr("disabled");
+
+			$.ajax({
+                url: '../start-vehicle?origin=' + origin + '&destination=' + destination + '&format=' + format,
+                async: true,
+                context: document.body,
+                success: function(result) {
+                	console.log(result);
+            	}
+            });
+		}
+
+		function resetTrip() {
+			$("#origin").removeAttr("disabled");
+			$("#destination").removeAttr("disabled");
+
+			$("#origin").val("");
+			$("#destination").val("");
+
+			$("input[name=transmission]").removeAttr("disabled");
+			$("input[name=format]").removeAttr("disabled");
+			$("input[name=cluster]").removeAttr("disabled");
+
+			$("#start_trip").removeAttr("disabled");
+			$("#reset_trip").attr("disabled", "true");
+		}
+
+		$.ajax({
+			type: 'POST',
+			url: 'http://localhost:8082/consumers/my_json_consumer',
+			headers: {
+				'Access-Control-Allow-Origin': '*',
+				'Content-Type': 'application/vnd.kafka.v2+json'
+			},
+			data: {"name": "my_consumer_instance", "format": "json", "auto.offset.reset": "earliest"},
+			async: true,
+			success: function(response) {
+				console.log(response);
+    		}
+		});
+
+		var carIcon = L.icon({
+			iconUrl: 'images/car_icon.png',
+			iconSize:     [30, 40], // size of the icon
+			iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+		});
+
+		var vehicles_current = {};
+		var vehicles = [];
+
+		var ws = new WebSocket("ws://<ws-proxy-host>:7070/vehicle-location")
+		ws.onmessage = function(event) {
+			if (marker !== undefined) {
+				for(i=0; i<markers.length; i++) {
+					map.removeLayer(markers[i]);
+				}
+			}
+
+			var vehicle = JSON.parse(event.data);
+
+			if(!vehicles.includes(vehicle.regno)) {
+				vehicles.push(vehicle.regno);
+			}
+
+			vehicles_current[vehicle.regno] = [vehicle.latitude, vehicle.longitude];
+
+			for(i=0; i<vehicles.length; i++) {
+				marker = L.marker(vehicles_current[vehicles[i]], {icon: carIcon});
+				if(!markers.includes(marker)) {
+					markers.push(marker);
+				}
+				map.addLayer(marker);
+			}
+		}
+	</script>
+</body>
+</html>
